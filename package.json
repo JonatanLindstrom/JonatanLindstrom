@@ -1,0 +1,26 @@
+{
+  "name": "jonatanlindstroom",
+  "version": "1.0.0",
+  "description": "README Generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JonatanLindstrom/JonatanLindstrom.git"
+  },
+  "author": "Jonatan Lindström",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JonatanLindstrom/JonatanLindstrom/issues"
+  },
+  "homepage": "https://github.com/JonatanLindstrom/JonatanLindstrom#readme",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "dotenv": "^8.2.0",
+    "js-base64": "^3.4.5",
+    "js-yaml": "^3.14.0",
+    "mustache": "^4.0.1"
+  }
+}
