@@ -1,15 +1,12 @@
 require('dotenv').config()
 const yaml = require('js-yaml');
 const axios = require('axios').default;
-const request = require('request');
-const svg2img = require('svg2img');
 const { render } = require('mustache');
 const { encode } = require('js-base64');
 const { readFile, existsSync, mkdirSync, writeFileSync } = require('fs');
-const getRepoLanguages = require('./graphql/get-repo-languages.js');
 
-const { PerformanceObserver, performance } = require('perf_hooks');
-
+// const techStack = require('./resources/techStack.json')
+// const getRepoLanguages = require('./graphql/get-repo-languages.js');
 
 // async function repoLanguages() {
 //   const graphQLClient = new GraphQLClient('https://api.github.com/graphql', {
@@ -46,12 +43,8 @@ const { PerformanceObserver, performance } = require('perf_hooks');
 // }
 
 async function getLanguageColors() {
-  return new Promise((resolve, reject) => { 
-    request.get('https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml', (error, resp, body) => {
-      if (error) reject
-      resolve(yaml.safeLoad(body))
-    })
-  })
+  return axios.request('https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml')
+              .then(res => yaml.safeLoad(res.data) )
 }
 
 async function getWakaStats() {
@@ -71,7 +64,8 @@ async function getWakaStats() {
 
   let languages = response.data.data.languages.slice(0, 5)
   languages.forEach(lang => {
-    lang.imgPath = `images/${lang.name}.png`
+    lang.name = encodeURIComponent(lang.name)
+    lang.imgPath = `images/${lang.name}.svg`
     if (ghLanguages[lang.name]) {
       lang.color = ghLanguages[lang.name].color
       if (!lang.color && ghLanguages[lang.name].group) {
@@ -83,6 +77,11 @@ async function getWakaStats() {
     console.log('WakaTime Stats')
     console.log(lang.name, ' with color ', lang.color, ' has: ', lang.percent)
     generateImg(lang.name, lang.color, lang.percent, lang.imgPath)
+
+    lang.percent = lang.percent.toLocaleString(undefined, { 
+      minimumFractionDigits: 1, 
+      maximumFractionDigits: 1
+    })
   })
 
   return languages
@@ -100,25 +99,22 @@ function generateImg(name, color, percent, path) {
 
   readFile('./progressBar.mustache', (err, data) =>  {
     if (err) throw err;
-    let output = render(data.toString(), DATA);
+    let outputLight = render(data.toString(), { ...DATA, textColor: '#000'});
+    writeFileSync(path.replace('.svg', '_light.svg'), outputLight)
 
-    const options = {
-      width: 400, 
-      height: 20,
-      format: 'png',
-      quality: 1000
-    }
-    
-    svg2img(output, options, (error, buffer) => {
-      writeFileSync(path, buffer);
-    });
+    let outputDark = render(data.toString(), { ...DATA, textColor: '#fff'});
+    writeFileSync(path.replace('.svg', '_dark.svg'), outputDark)
   });
 }
 
 function generateReadMe() {
   getWakaStats().then(languages => {
+    const languagesLight = languages.map(lang => ({ ...lang, imgPath: lang.imgPath.replace('.svg', '_light.svg') }))
+    const languagesDark = languages.map(lang => ({ ...lang, imgPath: lang.imgPath.replace('.svg', '_dark.svg') }))
+
     const DATA = {
-      languages, 
+      languagesLight,
+      languagesDark,
       date: new Date().toLocaleString('en-CA', {
         year: 'numeric',
         month: 'long',
@@ -126,6 +122,7 @@ function generateReadMe() {
         hour: '2-digit', 
         minute:'2-digit',
         hour12: false,
+        timeZone: 'Europe/Stockholm',
         timeZoneName: 'short'
       })
     };

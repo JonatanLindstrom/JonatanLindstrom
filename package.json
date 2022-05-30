@@ -8,20 +8,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JonatanLindstroom/JonatanLindstroom.git"
+    "url": "git+https://github.com/JonatanLindstrom/JonatanLindstrom.git"
   },
   "author": "Jonatan Lindström",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/JonatanLindstroom/JonatanLindstroom/issues"
+    "url": "https://github.com/JonatanLindstrom/JonatanLindstrom/issues"
   },
-  "homepage": "https://github.com/JonatanLindstroom/JonatanLindstroom#readme",
+  "homepage": "https://github.com/JonatanLindstrom/JonatanLindstrom#readme",
   "dependencies": {
     "axios": "^0.19.2",
     "dotenv": "^8.2.0",
     "js-base64": "^3.4.5",
     "js-yaml": "^3.14.0",
-    "mustache": "^4.0.1",
-    "svg2img": "^0.8.1"
+    "mustache": "^4.0.1"
   }
 }
